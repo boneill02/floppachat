@@ -59,6 +59,9 @@ class Users(Resource):
         return {'data': data}, 200
 
     def get_user_by_id(self, uid):
+        """
+        Returns user with user_id=uid
+        """
         user = {}
         conn = db_connect()
         conn.row_factory = sqlite3.Row
@@ -74,6 +77,9 @@ class Users(Resource):
         return user
 
     def insert_user(self, user):
+        """
+        Inserts user with the given attributes
+        """
         inserted_user = {}
         conn = db_connect()
         try:
