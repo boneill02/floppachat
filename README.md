@@ -7,13 +7,10 @@ meme. This is the API, which will hopefully be used to create a web interface.
 
 * Python 3.9+
 
-## Installation
+## Documentation
 
-`python setup.py`
-
-## Usage
-
-Documentation will be provided in the near future.
+Docs can be built using `tox` and `sphinx`. Make sure you have `sphinx`
+installed, then run `tox` in the project's root directory.
 
 ## Bugs
 
