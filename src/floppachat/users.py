@@ -2,7 +2,12 @@ from flask_restful import Resource, reqparse
 from db import *
 
 class Users(Resource):
-    def create_table():
+    def __init__(self):
+        self.table = 'users'
+        self.fields = [ 'user_id', 'username', 'email', 'pass' ]
+        self.create_table()
+
+    def create_table(self):
         """
         Creates the users table in the SQLite database
         """
@@ -23,58 +28,39 @@ class Users(Resource):
         finally:
             conn.close()
 
-    def cur_to_dict(self, cur):
-        """
-        Helper function to convert data in SQLite cursor to a dictionary
-        """
-        res = []
-        rows = cur.fetchall()
-        print(rows)
-        for row in rows:
-            user = {}
-            user['user_id'] = row['user_id']
-            user['username'] = row['username']
-            user['email'] = row['email']
-            user['pass'] = row['pass']
-            res.append(user)
-        return res
-
     def get(self):
         """
         Returns all users (invoked in HTTP GET request for /users)
         """
-        data = {}
+        return db_select(self.table, self.fields)
+
+    def get_user_by_id(self, uid): # TODO make generic function in db.py for this
+        """
+        Returns user with user_id=uid
+        """
+        query = 'SELECT * FROM ' + self.table + 'WHERE user_id = ' + uid
         conn = db_connect()
+        cur = conn.cursor()
         conn.row_factory = sqlite3.Row
         try:
             cur = conn.cursor()
-            cur.execute('SELECT * FROM users')
+            cur.execute(query)
             data = self.cur_to_dict(cur)
         except:
-            print('Failed to pull all users from database')
+            print('Failed to execute query: ' + query)
             return {'data': {}}, 500
         finally:
             conn.close()
 
-        return {'data': data}, 200
-
-    def get_user_by_id(self, uid):
-        """
-        Returns user with user_id=uid
-        """
-        user = {}
-        conn = db_connect()
-        conn.row_factory = sqlite3.Row
-        try:
-            cur = conn.cursor()
-            cur.execute('SELECT * FROM users WHERE user_id = ?', (uid,))
-            user = self.cur_to_dict(cur)
-        except:
-            print('Failed to retrieve user with id ' + uid)
-        finally:
-            conn.close()
-        
-        return user
+        res = []
+        rows = cur.fetchall()
+        print(rows)
+        for row in rows:
+            contents = {}
+            for f in self.fields:
+                contents[f] = row[f]
+            res.append(row)
+        return res
 
     def insert_user(self, user):
         """
@@ -95,7 +81,7 @@ class Users(Resource):
             conn.close()
 
         return inserted_user
-    
+
     def post(self):
         """
         Adds a user (invoked in HTTP POST request for /users)
