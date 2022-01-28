@@ -1,6 +1,5 @@
 from flask_restful import Resource
 
-# TODO implement
 class Messages(Resource):
     def __init__(self):
         self.table = 'messages'
@@ -32,6 +31,6 @@ class Messages(Resource):
 
     def get(self):
         """
-        Returns all messages (invoked in HTTP GET request for /messages
+        Returns all messages (invoked in HTTP GET request for /messages)
         """
-        return db_select(self.table, self.fields)
+        return db_select_all(self.table, self.fields)

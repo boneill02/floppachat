@@ -32,7 +32,7 @@ class Users(Resource):
         """
         Returns all users (invoked in HTTP GET request for /users)
         """
-        return db_select(self.table, self.fields)
+        return db_select_all(self.table, self.fields)
 
     def get_user_by_id(self, uid): # TODO make generic function in db.py for this
         """
