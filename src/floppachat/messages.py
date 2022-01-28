@@ -1,4 +1,5 @@
 from flask_restful import Resource
+from db import *
 
 class Messages(Resource):
     def __init__(self):
