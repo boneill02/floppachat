@@ -11,8 +11,8 @@ class Users(Resource):
         """
         Creates the users table in the SQLite database
         """
+        conn = db_connect()
         try:
-            conn = db_connect()
             conn.execute('''
                 CREATE TABLE users (
                     user_id INTEGER PRIMARY KEY NOT NULL,
@@ -26,41 +26,17 @@ class Users(Resource):
         except:
             print('Failed to create users table')
         finally:
-            conn.close()
+            if conn != None:
+                conn.close()
 
     def get(self):
         """
         Returns all users (invoked in HTTP GET request for /users)
         """
-        return db_select_all(self.table, self.fields)
+        return db_select(self.table)
 
-    def get_user_by_id(self, uid): # TODO make generic function in db.py for this
-        """
-        Returns user with user_id=uid
-        """
-        query = 'SELECT * FROM ' + self.table + 'WHERE user_id = ' + uid
-        conn = db_connect()
-        cur = conn.cursor()
-        conn.row_factory = sqlite3.Row
-        try:
-            cur = conn.cursor()
-            cur.execute(query)
-            data = self.cur_to_dict(cur)
-        except:
-            print('Failed to execute query: ' + query)
-            return {'data': {}}, 500
-        finally:
-            conn.close()
-
-        res = []
-        rows = cur.fetchall()
-        print(rows)
-        for row in rows:
-            contents = {}
-            for f in self.fields:
-                contents[f] = row[f]
-            res.append(row)
-        return res
+    def get_user_by_id(self, uid):
+        return db_select(self.table, None, 'user_id = ' + str(uid))
 
     def insert_user(self, user):
         """
@@ -68,17 +44,12 @@ class Users(Resource):
         """
         inserted_user = {}
         conn = db_connect()
-        try:
-            cur = conn.cursor()
-            cur.execute('INSERT INTO users (username, email, pass) VALUES (?, ?, ?)',
-                    (user['username'], user['email'], user['pass']))
-            conn.commit()
-            uid = cur.lastrowid
-            inserted_user = self.get_user_by_id(uid)
-        except:
-            print('Failed to insert user')
-        finally:
-            conn.close()
+        cur = conn.cursor()
+        cur.execute('INSERT INTO users (username, email, pass) VALUES (?, ?, ?)',
+                (user['username'], user['email'], user['pass']))
+        conn.commit()
+        uid = cur.lastrowid
+        inserted_user = self.get_user_by_id(uid)
 
         return inserted_user
 
@@ -103,5 +74,5 @@ class Users(Resource):
         if result == {}:
             return {'data': {}}, 500
         else:
-            data = self.get_user_by_id(result[0]['user_id'])
+            data = self.get()
             return {'data': data}, 200

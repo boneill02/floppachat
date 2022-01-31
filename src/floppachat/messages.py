@@ -34,4 +34,4 @@ class Messages(Resource):
         """
         Returns all messages (invoked in HTTP GET request for /messages)
         """
-        return db_select_all(self.table, self.fields)
+        return db_select(self.table)
