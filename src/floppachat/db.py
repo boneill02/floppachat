@@ -41,6 +41,7 @@ def db_select(table, fields=None, where=None):
     cur = conn.cursor()
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
+    print(query)
     cur.execute(query)
 
     res = []

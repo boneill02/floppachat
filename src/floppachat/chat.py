@@ -1,4 +1,5 @@
 # The chat server
+import requests
 import socket
 import select
 import sys
@@ -9,6 +10,10 @@ ip_addr = '127.0.0.1'
 port = 4321
 max_connections = 100
 max_msg_size = 100
+
+api_ip_addr = '127.0.0.1'
+api_port = 5000
+
 
 clients = []
 
@@ -22,17 +27,30 @@ def client_thread(conn, addr):
     conn.send('CONNECTION OPENED\n'.encode())
     while True:
         """
-        Message format: '<token>\n<roomid>\n<toptext>\n<bottomtext>\n<imgurl>'
+        Message format: '<token>\n<senderid>\n<roomid>\n<toptext>\n<bottomtext>\n<imgurl>'
         """
         message = conn.recv(max_msg_size)
         if message:
             mlines = message.splitlines()
             token = mlines[0] # TODO validate token
-            room = mlines[1]
-            top = mlines[2]
-            bottom = mlines[3]
-            url = mlines[4]
-            print(message)
+            sender_id = mlines[1]
+            room = mlines[2]
+            top = mlines[3]
+            bottom = mlines[4]
+            url = mlines[5]
+
+            # send to API
+            fields = {
+                    'token': token,
+                    'sender_id': sender_id,
+                    'room_id': room,
+                    'top': top,
+                    'bottom': bottom,
+                    'img_url': url
+            }
+            r = requests.post('http://' + api_ip_addr + ':' + str(api_port) + '/messages', data=fields)
+            print(r.text)
+            
 
 def broadcast(message, connection):
     for client in clients:

@@ -70,6 +70,7 @@ class Messages(Resource):
         parser.add_argument('bottom', required=True)
         parser.add_argument('img_url', required=True)
         args = parser.parse_args()
+        print(args)
 
         new_msg = {
             'sender_id': args['sender_id'],
