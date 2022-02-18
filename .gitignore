@@ -8,3 +8,4 @@ docs/source
 __pycache__
 *.egg-info
 .coverage
+database.db
