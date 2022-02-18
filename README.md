@@ -3,6 +3,18 @@
 Connect with others through Impact memes. A chat app where each message is a
 meme. This is the API, which will hopefully be used to create a web interface.
 
+## Hosting
+
+```
+cd src/floppachat
+python api.py # start API
+python chat.py # start chat server
+```
+
+## Connecting
+
+`python tinyclient.py`
+
 ## Dependencies
 
 * Python 3.9+
